@@ -1,0 +1,105 @@
+@model IEnumerable<WebTrienLam.Models.TrangPhuc>
+
+@{
+    ViewData["Title"] = "Bộ Sưu Tập Yêu Thích";
+}
+
+<div class="favorites-page-container">
+    <div class="favorites-header">
+        <span class="logo-symbol">⚜</span>
+        <h2>BỘ SƯU TẬP CỦA TÔI</h2>
+        <p class="subtitle">Các trang phục cung đình và hiện vật thời Nguyễn bạn đã lưu lưu giữ</p>
+        <div class="gold-decor-small"></div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-favorites">
+            <span class="empty-fav-icon">♥</span>
+            <h3>Bộ sưu tập đang trống</h3>
+            <p>Hãy dạo quanh triển lãm và bấm lưu những trang phục bạn yêu thích nhất để lưu lại tại đây nhé.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn-royal">Khám Phá Triển Lãm</a>
+        </div>
+    }
+    else
+    {
+        <div class="gallery-grid">
+            @foreach (var item in Model)
+            {
+                <div class="gallery-card" id="card-item-@item.Id">
+                    <!-- Ảnh hiện vật & hiệu ứng phủ -->
+                    <div class="card-image-wrapper">
+                        <img src="@item.HinhAnh" alt="@item.TenTrangPhuc" class="card-img" />
+                        <div class="image-overlay-hover">
+                            <a asp-controller="TrangPhuc" asp-action="Details" asp-route-id="@item.Id" class="btn-details-overlay">Xem Chi Tiết</a>
+                        </div>
+                        <span class="card-badge">@item.LoaiTrangPhuc</span>
+                        
+                        <!-- Nút Xóa Yêu Thích Nhanh -->
+                        <button type="button" class="btn-quick-fav saved remove-fav-btn" 
+                                data-id="@item.Id" title="Xóa khỏi bộ sưu tập">
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Nội dung tóm tắt -->
+                    <div class="card-body-custom">
+                        <div class="card-meta">
+                            <span class="card-era">@item.TrieuDai</span>
+                        </div>
+                        <h3 class="card-title">
+                            <a asp-controller="TrangPhuc" asp-action="Details" asp-route-id="@item.Id">@item.TenTrangPhuc</a>
+                        </h3>
+                        <p class="card-desc">@item.MoTaNgan</p>
+                    </div>
+
+                    <!-- Chân thẻ card -->
+                    <div class="card-footer-custom">
+                        <a asp-controller="TrangPhuc" asp-action="Details" asp-route-id="@item.Id" class="btn-readmore">
+                            Xem thêm <span class="arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Xử lý nút xóa yêu thích từ danh sách favorites
+            $('.remove-fav-btn').click(function (e) {
+                e.preventDefault();
+                var btn = $(this);
+                var id = btn.data('id');
+                
+                $.ajax({
+                    url: '/Home/ToggleFavorite',
+                    type: 'POST',
+                    data: { costumeId: id },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success && !response.isSaved) {
+                            // Ẩn thẻ card đi một cách mượt mà
+                            $('#card-item-' + id).fadeOut(300, function() {
+                                $(this).remove();
+                                // Nếu không còn thẻ nào, tải lại trang để hiện trạng thái trống
+                                if ($('.gallery-card').length === 0) {
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            alert("Không thể thực hiện tác vụ xóa.");
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối mạng. Vui lòng thử lại.");
+                    }
+                });
+            });
+        });
+    </script>
+}

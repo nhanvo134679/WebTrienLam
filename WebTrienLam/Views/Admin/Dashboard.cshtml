@@ -1,0 +1,101 @@
+@model IEnumerable<WebTrienLam.Models.TrangPhuc>
+
+@{
+    ViewData["Title"] = "Bảng Điều Hướng Admin";
+}
+
+<div class="admin-dashboard-container">
+    <!-- Header Quản Trị -->
+    <div class="dashboard-header">
+        <div class="header-left">
+            <h2>HỆ THỐNG QUẢN TRỊ DỮ LIỆU</h2>
+            <p class="subtitle">Quản lý kho hiện vật, trang phục và kiểm duyệt nội dung</p>
+        </div>
+        <div class="header-right" style="display: flex; gap: 15px;">
+            <a asp-action="LoaiTrangPhucList" class="btn-royal-outline">⚙ Quản Lý Loại Trang Phục</a>
+            <a asp-action="Create" class="btn-royal">+ Thêm Hiện Vật Mới</a>
+        </div>
+    </div>
+
+    <!-- Hộp thông báo thành công -->
+    @if (TempData["AdminSuccess"] != null)
+    {
+        <div class="alert alert-success-custom">
+            @TempData["AdminSuccess"]
+        </div>
+    }
+
+    <!-- Khối thẻ thống kê -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⛩</div>
+            <div class="stat-info">
+                <span class="stat-label">Tổng hiện vật</span>
+                <span class="stat-value">@ViewBag.TotalCostumes</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <span class="stat-label">Người đăng ký</span>
+                <span class="stat-value">@ViewBag.TotalUsers</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">♥</div>
+            <div class="stat-info">
+                <span class="stat-label">Lượt yêu thích</span>
+                <span class="stat-value">@ViewBag.TotalFavorites</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bảng danh sách quản lý -->
+    <div class="admin-table-wrapper">
+        <div class="table-title">DANH SÁCH HIỆN VẬT TRƯNG BÀY</div>
+        <table class="table-royal">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Hình ảnh</th>
+                    <th>Tên Trang Phục</th>
+                    <th>Phân Loại</th>
+                    <th>Triều Đại / Niên Đại</th>
+                    <th style="width: 160px; text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Kho dữ liệu trống. Hãy thêm hiện vật đầu tiên!</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@item.HinhAnh" alt="@item.TenTrangPhuc" class="table-thumbnail" />
+                            </td>
+                            <td>
+                                <strong class="table-item-name">@item.TenTrangPhuc</strong>
+                                <p class="table-item-desc">@item.MoTaNgan</p>
+                            </td>
+                            <td><span class="table-badge">@item.LoaiTrangPhuc</span></td>
+                            <td>@item.TrieuDai <br/><small class="text-muted">@item.NienDai</small></td>
+                            <td class="table-actions">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-table-edit">Sửa</a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn hiện vật này khỏi hệ thống triển lãm?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-table-delete">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

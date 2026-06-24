@@ -1,0 +1,31 @@
+@model WebTrienLam.Models.LoaiTrangPhuc
+
+@{
+    ViewData["Title"] = "Thêm Loại Trang Phục Mới";
+}
+
+<div class="admin-form-container" style="max-width: 600px;">
+    <div class="form-header">
+        <a asp-action="LoaiTrangPhucList" class="btn-back-dashboard">← Quay Về Quản Lý</a>
+        <h2>THÊM LOẠI TRANG PHỤC MỚI</h2>
+        <p class="subtitle">Tạo phân loại mới để hiển thị và phân chia bộ sưu tập hiện vật triển lãm</p>
+    </div>
+
+    <div class="form-card-wrapper">
+        <form asp-action="CreateLoaiTrangPhuc" method="post" class="form-royal-style">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger-custom"></div>
+
+            <div class="form-group-custom">
+                <label asp-for="TenLoai">Tên Loại Trang Phục</label>
+                <input asp-for="TenLoai" placeholder="Ví dụ: Triều phục, Bá quan, Trang phục lính..." required autocomplete="off" />
+                <span asp-validation-for="TenLoai" class="text-danger-custom"></span>
+            </div>
+
+            <div class="form-actions-custom" style="margin-top: 20px; padding-top: 15px;">
+                <a asp-action="LoaiTrangPhucList" class="btn-royal-outline">Hủy Bỏ</a>
+                <button type="submit" class="btn-royal">Xác Nhận Thêm</button>
+            </div>
+        </form>
+    </div>
+</div>

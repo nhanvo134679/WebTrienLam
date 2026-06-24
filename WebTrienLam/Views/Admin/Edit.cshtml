@@ -1,0 +1,127 @@
+@model WebTrienLam.Models.TrangPhuc
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Hiện Vật";
+}
+
+<div class="admin-form-container">
+    <div class="form-header">
+        <a asp-action="Dashboard" class="btn-back-dashboard">← Quay Về Quản Trị</a>
+        <h2>CHỈNH SỬA HIỆN VẬT TRIỂN LÃM</h2>
+        <p class="subtitle">Cập nhật thông tin chi tiết hoặc sửa đổi hình ảnh của hiện vật trưng bày</p>
+    </div>
+
+    <div class="form-card-wrapper">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="form-royal-style">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger-custom"></div>
+            
+            <!-- Hidden inputs to retain metadata -->
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="LuotXem" />
+            <input type="hidden" asp-for="NgayTao" />
+            <input type="hidden" asp-for="HinhAnh" id="old-image-path" />
+
+            <div class="form-grid">
+                <!-- Cột trái: Các trường nhập cơ bản -->
+                <div class="form-left-col">
+                    <div class="form-group-custom">
+                        <label asp-for="TenTrangPhuc">Tên Hiện Vật / Trang Phục</label>
+                        <input asp-for="TenTrangPhuc" placeholder="Ví dụ: Áo Nhật Bình Cung Tần..." required />
+                        <span asp-validation-for="TenTrangPhuc" class="text-danger-custom"></span>
+                    </div>
+
+                    <div class="form-row-two">
+                        <div class="form-group-custom">
+                            <label asp-for="LoaiTrangPhuc">Phân Loại Trang Phục</label>
+                            <select asp-for="LoaiTrangPhuc" required>
+                                <option value="">-- Chọn phân loại --</option>
+                                @if (ViewBag.LoaiTrangPhucs != null)
+                                {
+                                    foreach (var item in ViewBag.LoaiTrangPhucs as List<WebTrienLam.Models.LoaiTrangPhuc>)
+                                    {
+                                        <option value="@item.TenLoai">@item.TenLoai</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="LoaiTrangPhuc" class="text-danger-custom"></span>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label asp-for="NienDai">Niên Đại</label>
+                            <input asp-for="NienDai" placeholder="Ví dụ: 1802 - 1945 hoặc Thế kỷ 19" required />
+                            <span asp-validation-for="NienDai" class="text-danger-custom"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row-two">
+                        <div class="form-group-custom">
+                            <label asp-for="TrieuDai">Triều Đại</label>
+                            <input asp-for="TrieuDai" placeholder="Ví dụ: Triều Nguyễn" required />
+                            <span asp-validation-for="TrieuDai" class="text-danger-custom"></span>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="AnhUp">Thay Đổi Ảnh Hiện Vật (Để trống nếu giữ ảnh cũ)</label>
+                            <input type="file" id="AnhUp" name="AnhUp" accept="image/*" />
+                            <span asp-validation-for="HinhAnh" class="text-danger-custom"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label asp-for="MoTaNgan">Mô Tả Ngắn (Hiển thị ở trang danh sách)</label>
+                        <textarea asp-for="MoTaNgan" rows="3" placeholder="Viết mô tả ngắn hấp dẫn..." required></textarea>
+                        <span asp-validation-for="MoTaNgan" class="text-danger-custom"></span>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Xem trước hình ảnh -->
+                <div class="form-right-col">
+                    <div class="image-preview-title">Xem trước hình ảnh hiển thị</div>
+                    <div class="image-preview-frame">
+                        <img id="img-preview" src="@Model.HinhAnh" alt="Xem trước ảnh" class="preview-img" onerror="this.src='https://placehold.co/400x300/1e1e1e/d4af37?text=Không+Tìm+Thấy+Ảnh';" />
+                        <span class="preview-corner top-left"></span>
+                        <span class="preview-corner top-right"></span>
+                        <span class="preview-corner bottom-left"></span>
+                        <span class="preview-corner bottom-right"></span>
+                    </div>
+                    <small class="preview-tip">Tải lên tệp ảnh mới để thay thế, hoặc để trống để giữ nguyên hình ảnh hiện tại.</small>
+                </div>
+            </div>
+
+            <!-- Trường soạn thảo nội dung chi tiết dạng HTML -->
+            <div class="form-group-custom full-width">
+                <label asp-for="NoiDungChiTiet">Nội dung chi tiết lịch sử (Hỗ trợ thẻ HTML)</label>
+                <textarea asp-for="NoiDungChiTiet" rows="10" placeholder="Sử dụng các thẻ HTML như <p>, <strong>, <ul>, <li> để trình bày nội dung bài viết triển lãm đẹp mắt." required></textarea>
+                <span asp-validation-for="NoiDungChiTiet" class="text-danger-custom"></span>
+            </div>
+
+            <div class="form-actions-custom">
+                <a asp-action="Dashboard" class="btn-royal-outline">Hủy Bỏ</a>
+                <button type="submit" class="btn-royal">Lưu Lại Thay Đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Xem trước ảnh mới được chọn
+            $('#AnhUp').change(function() {
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#img-preview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    // Nếu hủy chọn, khôi phục ảnh cũ
+                    var oldPath = $('#old-image-path').val();
+                    $('#img-preview').attr('src', oldPath || 'https://placehold.co/400x300/1e1e1e/d4af37?text=Không+Tìm+Thấy+Ảnh');
+                }
+            });
+        });
+    </script>
+}

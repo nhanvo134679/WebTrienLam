@@ -1,0 +1,110 @@
+@model WebTrienLam.Models.TrangPhuc
+
+@{
+    ViewData["Title"] = Model.TenTrangPhuc;
+    bool isFavorite = ViewBag.IsFavorite;
+}
+
+<div class="exhibition-details-container">
+    <!-- Nút quay lại trang chủ triển lãm -->
+    <div class="back-navigation">
+        <a asp-controller="Home" asp-action="Index" class="btn-back">
+            <span class="arrow">←</span> Trở Về Triển Lãm
+        </a>
+    </div>
+
+    <div class="details-grid">
+        <!-- Cột hiển thị hình ảnh cổ vật / trang phục -->
+        <div class="details-image-section">
+            <div class="image-frame">
+                <img src="@Model.HinhAnh" alt="@Model.TenTrangPhuc" class="artifact-big-image" />
+                <div class="frame-corners">
+                    <span class="corner top-left"></span>
+                    <span class="corner top-right"></span>
+                    <span class="corner bottom-left"></span>
+                    <span class="corner bottom-right"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột hiển thị thông tin chi tiết -->
+        <div class="details-info-section">
+            <div class="badge-row">
+                <span class="exhibit-badge text-uppercase">@Model.LoaiTrangPhuc</span>
+                <span class="era-badge">@Model.TrieuDai (@Model.NienDai)</span>
+            </div>
+
+            <div class="title-row">
+                <h1 class="exhibit-title">@Model.TenTrangPhuc</h1>
+                
+                <!-- Nút Lưu Yêu Thích Tương Tác Bằng AJAX -->
+                <button type="button" class="btn-favorite-toggle @(isFavorite ? "active" : "")" 
+                        data-id="@Model.Id" title="@(isFavorite ? "Bỏ lưu yêu thích" : "Lưu vào yêu thích")">
+                    <span class="heart-icon">♥</span>
+                    <span class="btn-fav-text">@(isFavorite ? "Đã Lưu Yêu Thích" : "Lưu Yêu Thích")</span>
+                </button>
+            </div>
+
+            <div class="exhibit-stats">
+                <span class="stat-item"><i class="icon-calendar">📅</i> Đăng lúc: @Model.NgayTao.ToString("dd/MM/yyyy")</span>
+            </div>
+
+            <div class="divider-gold"></div>
+
+            <div class="exhibit-hook">
+                <p><em>"@Model.MoTaNgan"</em></p>
+            </div>
+
+            <div class="exhibit-content">
+                @Html.Raw(Model.NoiDungChiTiet)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-favorite-toggle').click(function () {
+                var btn = $(this);
+                var id = btn.data('id');
+                
+                // Gửi request AJAX toggle yêu thích
+                $.ajax({
+                    url: '/Home/ToggleFavorite',
+                    type: 'POST',
+                    data: { 
+                        costumeId: id 
+                    },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.isSaved) {
+                                btn.addClass('active');
+                                btn.find('.btn-fav-text').text('Đã Lưu Yêu Thích');
+                                btn.attr('title', 'Bỏ lưu yêu thích');
+                                // Hiển thị thông báo nhỏ hoặc hiệu ứng
+                            } else {
+                                btn.removeClass('active');
+                                btn.find('.btn-fav-text').text('Lưu Yêu Thích');
+                                btn.attr('title', 'Lưu vào yêu thích');
+                            }
+                        } else {
+                            // Nếu chưa đăng nhập, chuyển hướng đến trang Login
+                            if (response.redirectUrl) {
+                                window.location.href = response.redirectUrl;
+                            } else {
+                                alert("Có lỗi xảy ra: " + response.message);
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối đến hệ thống. Vui lòng thử lại sau.");
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,68 @@
+@model IEnumerable<WebTrienLam.Models.LoaiTrangPhuc>
+
+@{
+    ViewData["Title"] = "Quản Lý Loại Trang Phục";
+}
+
+<div class="admin-dashboard-container">
+    <!-- Header Quản Trị -->
+    <div class="dashboard-header">
+        <div class="header-left">
+            <a asp-action="Dashboard" class="btn-back-dashboard" style="margin-bottom: 10px; display: inline-block;">← QUAY VỀ QUẢN TRỊ</a>
+            <h2>QUẢN LÝ LOẠI TRANG PHỤC</h2>
+            <p class="subtitle">Quản lý danh sách các phân loại, danh mục trang phục hiển thị trên triển lãm số</p>
+        </div>
+        <div class="header-right">
+            <a asp-action="CreateLoaiTrangPhuc" class="btn-royal">+ Thêm Loại Mới</a>
+        </div>
+    </div>
+
+    <!-- Hộp thông báo thành công -->
+    @if (TempData["AdminSuccess"] != null)
+    {
+        <div class="alert alert-success-custom">
+            @TempData["AdminSuccess"]
+        </div>
+    }
+
+    <!-- Bảng danh sách quản lý -->
+    <div class="admin-table-wrapper">
+        <div class="table-title">DANH MỤC PHÂN LOẠI HIỆN VẬT</div>
+        <table class="table-royal">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">ID</th>
+                    <th>Tên Loại Trang Phục</th>
+                    <th style="width: 240px; text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">Chưa có loại trang phục nào. Hãy thêm phân loại đầu tiên!</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>
+                                <strong class="table-item-name">@item.TenLoai</strong>
+                            </td>
+                            <td class="table-actions">
+                                <a asp-action="EditLoaiTrangPhuc" asp-route-id="@item.Id" class="btn-table-edit">Sửa</a>
+                                <form asp-action="DeleteLoaiTrangPhuc" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa loại trang phục này? Điều này có thể làm trống phần phân loại của các trang phục thuộc danh mục này.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-table-delete">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

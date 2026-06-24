@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Từ Chối Truy Cập";
+}
+
+<div class="auth-container">
+    <div class="auth-card text-center error-card">
+        <div class="auth-header">
+            <div class="museum-logo error-logo">
+                <span class="logo-symbol">⚠️</span>
+            </div>
+            <h2 class="text-danger-custom">TỪ CHỐI TRUY CẬP</h2>
+            <p class="auth-subtitle">Quyền Truy Cập Không Hợp Lệ</p>
+        </div>
+
+        <div class="error-content">
+            <p>Xin lỗi! Bạn không có quyền truy cập vào mục lưu trữ quản trị này.</p>
+            <p>Khu vực này chỉ dành riêng cho <strong>Ban Quản Trị Triển Lãm (Admin)</strong>.</p>
+        </div>
+
+        <div class="error-actions">
+            <a asp-controller="Home" asp-action="Index" class="btn-royal">Quay Về Trang Triển Lãm</a>
+            <a asp-action="Login" class="btn-royal-outline">Đăng Nhập Tài Khoản Admin</a>
+        </div>
+    </div>
+</div>

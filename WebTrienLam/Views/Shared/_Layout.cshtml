@@ -1,0 +1,105 @@
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Triển Lãm Trang Phục Nhà Nguyễn</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..700;1,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap and Custom CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="museum-theme">
+    <header class="museum-navbar-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-museum-light border-gold-bottom">
+            <div class="container-fluid px-4">
+                <!-- Logo Bảo tàng -->
+                <a class="navbar-brand brand-royal" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-symbol">✤</span> Văn Hóa
+                </a>
+                <button class="navbar-toggler toggler-royal" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-links-custom">
+                        <li class="nav-item">
+                            <a class="nav-link-royal active" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link-royal highlight-crimson" asp-controller="Admin" asp-action="Dashboard">Quản Trị</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link-royal highlight-crimson" asp-controller="Home" asp-action="Favorites">Bộ Sưu Tập</a>
+                                </li>
+                            }
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link-royal" asp-controller="Home" asp-action="Privacy">Liên Hệ</a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Khối thông tin Đăng nhập / Đăng xuất -->
+                    <div class="d-flex align-items-center auth-section-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            var fullName = User.FindFirst("FullName")?.Value ?? User.Identity.Name;
+                            var role = User.IsInRole("Admin") ? "Quản trị viên" : "Cổ nhân";
+                            
+                            <div class="user-greeting-nav text-end me-3">
+                                <span class="greeting-text">Chào mừng, <strong>@fullName</strong></span>
+                                <span class="role-badge-nav">@role</span>
+                            </div>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-royal-outline btn-sm">Đăng Xuất</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn-royal-outline btn-sm me-2">Đăng Nhập</a>
+                            <a asp-controller="Account" asp-action="Register" class="btn-royal btn-sm">Đăng Ký</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Nội dung chính của các view -->
+    <main role="main" class="museum-main-container">
+        @RenderBody()
+    </main>
+
+    <!-- Footer mang tính hoài cổ -->
+    <footer class="museum-footer">
+        <div class="footer-decor">
+            <span class="line"></span>
+            <span class="symbol">⚜</span>
+            <span class="line"></span>
+        </div>
+        <p class="footer-title">TRIỂN LÃM SỐ HÓA TRANG PHỤC CUNG ĐÌNH & DÂN GIAN THỜI NGUYỄN</p>
+        <p class="footer-credits">&copy; 2026 - Báo cáo môn học Lập trình Web - Triển lãm phục dựng văn hóa số</p>
+    </footer>
+
+    <!-- Thư viện scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
